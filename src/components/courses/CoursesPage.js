@@ -32,7 +32,7 @@ class CoursesPage extends React.Component {
       <>
         {this.state.redirectToAddCoursePage && <Redirect to="/course" />}
         <h2>Courses</h2>
-        <Spinner></Spinner> a {this.state.apiCallsInProgress}
+        <div>API CALLS: {this.props.apiCalls}</div>
         {this.props.loading ? (
           <Spinner />
         ) : (
@@ -52,10 +52,11 @@ class CoursesPage extends React.Component {
 }
 
 CoursesPage.propTypes = {
+  authors: PropTypes.array.isRequired,
   courses: PropTypes.array.isRequired,
   actions: PropTypes.object.isRequired,
-  authors: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired,
+  apiCalls: PropTypes.number.isRequired
 };
 
 function mapStateToProps(state) {
@@ -63,15 +64,15 @@ function mapStateToProps(state) {
     courses:
       state.authors.length === 0
         ? []
-        : state.courses.map((course) => {
+        : state.courses.map(course => {
             return {
               ...course,
-              authorName: state.authors.find((a) => a.id === course.authorId)
-                .name,
+              authorName: state.authors.find(a => a.id === course.authorId).name
             };
           }),
     authors: state.authors,
     loading: state.apiCallsInProgress > 0,
+    apiCalls: state.apiCallsInProgress
   };
 }
 
@@ -80,8 +81,12 @@ function mapDispatchToProps(dispatch) {
     actions: {
       loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
       loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch),
-    },
+      deleteCourse: bindActionCreators(courseActions.deleteCourse, dispatch)
+    }
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CoursesPage);
